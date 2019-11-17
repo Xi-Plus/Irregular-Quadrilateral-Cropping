@@ -1,4 +1,5 @@
 import argparse
+import os
 import tkinter as tk
 from tkinter import filedialog
 
@@ -14,7 +15,7 @@ print(args)
 
 
 root = tk.Tk()
-
+root.title('Irregular Quadrilateral Cropping')
 
 pos = {
     'TL': (tk.IntVar(root, value=0), tk.IntVar(root, value=0)),
@@ -25,6 +26,8 @@ pos = {
 output = (tk.IntVar(root, value=args.height), tk.IntVar(root, value=args.width))
 
 img = None
+fileName = None
+fileExtension = None
 
 
 def mark_line(img):
@@ -58,12 +61,7 @@ def mark_line(img):
     return img_temp
 
 
-def show_images():
-    if img is None:
-        return
-
-    resize_img_to_show('input', mark_line(img))
-
+def crop_image():
     sourcePoints = np.array([
         (pos['TL'][1].get(), pos['TL'][0].get()),
         (pos['TR'][1].get(), pos['TR'][0].get()),
@@ -78,7 +76,15 @@ def show_images():
     ], dtype=np.float32)
     M = cv2.getPerspectiveTransform(sourcePoints, dstPoints)
     img_result = cv2.warpPerspective(img, M, (output[1].get(), output[0].get()))
-    resize_img_to_show('output', img_result, small=True)
+    return img_result
+
+
+def show_images():
+    if img is None:
+        return
+
+    resize_img_to_show('input', mark_line(img))
+    resize_img_to_show('output', crop_image(), small=True)
 
 
 def resize_img_to_show(name, img_temp, small=False):
@@ -96,16 +102,38 @@ def resize_img_to_show(name, img_temp, small=False):
 
 
 def openFile():
-    global img
+    global img, fileName, fileExtension
     file_path = filedialog.askopenfilename()
     print(file_path)
     if file_path is not None:
+        fileName = os.path.basename(file_path)
+        fileExtension = os.path.splitext(file_path)[1]
+
         img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
         pos['BL'][0].set(img.shape[0] - 1)
         pos['BR'][0].set(img.shape[0] - 1)
         pos['TR'][1].set(img.shape[1] - 1)
         pos['BR'][1].set(img.shape[1] - 1)
         show_images()
+
+
+def saveFile():
+    global img
+    if img is None:
+        return
+    out_path = filedialog.asksaveasfilename(
+        filetypes=[
+            ('PNG File', '*.png'),
+            ('JPEG File', '*.jpg'),
+            ('All files', '*'),
+        ],
+        initialfile=fileName,
+        defaultextension=fileExtension,
+    )
+    print(out_path)
+    if out_path:
+        img_result = crop_image()
+        cv2.imwrite(out_path, img_result)
 
 
 def changePos(corner, xy, diff):
@@ -190,5 +218,8 @@ tk.Label(root, text='Out1').grid(row=ROW, column=5)
 tk.Entry(root, textvariable=output[1]).grid(row=ROW, column=6)
 tk.Button(root, text=' - ', command=changeOutput(1, -1)).grid(row=ROW, column=7)
 tk.Button(root, text=' + ', command=changeOutput(1, +1)).grid(row=ROW, column=8)
+
+ROW += 1
+tk.Button(root, text='Save File', command=saveFile).grid(row=ROW, column=0, columnspan=2, sticky='W')
 
 root.mainloop()

@@ -92,10 +92,10 @@ def resize_img_to_show(name, img_temp, small=False):
         return
     height = img_temp.shape[0]
     width = img_temp.shape[1]
-    if small and width <= 900:
+    if small and height <= 700:
         ratio = 1
     else:
-        ratio = 900 / width
+        ratio = 700 / height
     height = int(height * ratio)
     width = int(width * ratio)
     cv2.imshow(name, cv2.resize(img_temp, (width, height)))
@@ -153,71 +153,52 @@ def changeOutput(xy, diff):
 ROW = 0
 tk.Button(root, text='Open File', command=openFile).grid(row=ROW, column=0, columnspan=2, sticky='W')
 
+for xy in [0, 1]:
+    ROW += 1
+    COL = -1
+    for corner in ['TL', 'TR']:
+        COL += 1
+        tk.Label(root, text='{}{}'.format(corner, xy)).grid(row=ROW, column=COL)
+        COL += 1
+        tk.Entry(root, textvariable=pos[corner][xy]).grid(row=ROW, column=COL)
+        for diff in [1, 10, 100]:
+            COL += 1
+            tk.Button(root, text=' {:+d} '.format(-diff), command=changePos(corner, xy, -diff)).grid(row=ROW, column=COL)
+            COL += 1
+            tk.Button(root, text=' {:+d} '.format(+diff), command=changePos(corner, xy, +diff)).grid(row=ROW, column=COL)
+
 ROW += 1
-tk.Label(root, text='TL0').grid(row=ROW, column=0)
-tk.Entry(root, textvariable=pos['TL'][0]).grid(row=ROW, column=1)
-tk.Button(root, text=' - ', command=changePos('TL', 0, -1)).grid(row=ROW, column=2)
-tk.Button(root, text=' + ', command=changePos('TL', 0, +1)).grid(row=ROW, column=3)
+tk.Label(root, text='').grid(row=ROW, column=0)
 
-tk.Label(root, text=' ').grid(row=ROW, column=4)
-tk.Label(root, text='TR0').grid(row=ROW, column=5)
-tk.Entry(root, textvariable=pos['TR'][0]).grid(row=ROW, column=6)
-tk.Button(root, text=' - ', command=changePos('TR', 0, -1)).grid(row=ROW, column=7)
-tk.Button(root, text=' + ', command=changePos('TR', 0, +1)).grid(row=ROW, column=8)
-
-ROW += 1
-tk.Label(root, text='TL1').grid(row=ROW, column=0)
-tk.Entry(root, textvariable=pos['TL'][1]).grid(row=ROW, column=1)
-tk.Button(root, text=' - ', command=changePos('TL', 1, -1)).grid(row=ROW, column=2)
-tk.Button(root, text=' + ', command=changePos('TL', 1, +1)).grid(row=ROW, column=3)
-
-tk.Label(root, text=' ').grid(row=ROW, column=4)
-tk.Label(root, text='TR1').grid(row=ROW, column=5)
-tk.Entry(root, textvariable=pos['TR'][1]).grid(row=ROW, column=6)
-tk.Button(root, text=' - ', command=changePos('TR', 1, -1)).grid(row=ROW, column=7)
-tk.Button(root, text=' + ', command=changePos('TR', 1, +1)).grid(row=ROW, column=8)
+for xy in [0, 1]:
+    ROW += 1
+    COL = -1
+    for corner in ['BL', 'BR']:
+        COL += 1
+        tk.Label(root, text='{}{}'.format(corner, xy)).grid(row=ROW, column=COL)
+        COL += 1
+        tk.Entry(root, textvariable=pos[corner][xy]).grid(row=ROW, column=COL)
+        for diff in [1, 10, 100]:
+            COL += 1
+            tk.Button(root, text=' {:+d} '.format(-diff), command=changePos(corner, xy, -diff)).grid(row=ROW, column=COL)
+            COL += 1
+            tk.Button(root, text=' {:+d} '.format(+diff), command=changePos(corner, xy, +diff)).grid(row=ROW, column=COL)
 
 ROW += 1
 tk.Label(root, text='').grid(row=ROW, column=0)
 
 ROW += 1
-tk.Label(root, text='BL0').grid(row=ROW, column=0)
-tk.Entry(root, textvariable=pos['BL'][0]).grid(row=ROW, column=1)
-tk.Button(root, text=' - ', command=changePos('BL', 0, -1)).grid(row=ROW, column=2)
-tk.Button(root, text=' + ', command=changePos('BL', 0, +1)).grid(row=ROW, column=3)
-
-tk.Label(root, text=' ').grid(row=ROW, column=4)
-tk.Label(root, text='BR0').grid(row=ROW, column=5)
-tk.Entry(root, textvariable=pos['BR'][0]).grid(row=ROW, column=6)
-tk.Button(root, text=' - ', command=changePos('BR', 0, -1)).grid(row=ROW, column=7)
-tk.Button(root, text=' + ', command=changePos('BR', 0, +1)).grid(row=ROW, column=8)
-
-ROW += 1
-tk.Label(root, text='BL1').grid(row=ROW, column=0)
-tk.Entry(root, textvariable=pos['BL'][1]).grid(row=ROW, column=1)
-tk.Button(root, text=' - ', command=changePos('BL', 1, -1)).grid(row=ROW, column=2)
-tk.Button(root, text=' + ', command=changePos('BL', 1, +1)).grid(row=ROW, column=3)
-
-tk.Label(root, text=' ').grid(row=ROW, column=4)
-tk.Label(root, text='BR1').grid(row=ROW, column=5)
-tk.Entry(root, textvariable=pos['BR'][1]).grid(row=ROW, column=6)
-tk.Button(root, text=' - ', command=changePos('BR', 1, -1)).grid(row=ROW, column=7)
-tk.Button(root, text=' + ', command=changePos('BR', 1, +1)).grid(row=ROW, column=8)
-
-ROW += 1
-tk.Label(root, text='').grid(row=ROW, column=0)
-
-ROW += 1
-tk.Label(root, text='Out0').grid(row=ROW, column=0)
-tk.Entry(root, textvariable=output[0]).grid(row=ROW, column=1)
-tk.Button(root, text=' - ', command=changeOutput(0, -1)).grid(row=ROW, column=2)
-tk.Button(root, text=' + ', command=changeOutput(0, +1)).grid(row=ROW, column=3)
-
-tk.Label(root, text=' ').grid(row=ROW, column=4)
-tk.Label(root, text='Out1').grid(row=ROW, column=5)
-tk.Entry(root, textvariable=output[1]).grid(row=ROW, column=6)
-tk.Button(root, text=' - ', command=changeOutput(1, -1)).grid(row=ROW, column=7)
-tk.Button(root, text=' + ', command=changeOutput(1, +1)).grid(row=ROW, column=8)
+COL = -1
+for xy in [0, 1]:
+    COL += 1
+    tk.Label(root, text='Out{}'.format(xy)).grid(row=ROW, column=COL)
+    COL += 1
+    tk.Entry(root, textvariable=output[xy]).grid(row=ROW, column=COL)
+    for diff in [1, 10, 100]:
+        COL += 1
+        tk.Button(root, text=' {:+d} '.format(-diff), command=changeOutput(xy, -diff)).grid(row=ROW, column=COL)
+        COL += 1
+        tk.Button(root, text=' {:+d} '.format(+diff), command=changeOutput(xy, +diff)).grid(row=ROW, column=COL)
 
 ROW += 1
 tk.Button(root, text='Save File', command=saveFile).grid(row=ROW, column=0, columnspan=2, sticky='W')

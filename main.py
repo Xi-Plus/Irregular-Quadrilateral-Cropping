@@ -28,6 +28,7 @@ output = (tk.IntVar(root, value=args.height), tk.IntVar(root, value=args.width))
 img = None
 fileName = None
 fileExtension = None
+inputRatio = None
 
 
 def mark_line(img):
@@ -85,6 +86,7 @@ def show_images():
 
     resize_img_to_show('input', mark_line(img))
     resize_img_to_show('output', crop_image(), small=True)
+    cv2.setMouseCallback('input', mouseClicked)
 
 
 def resize_img_to_show(name, img_temp, small=False):
@@ -99,6 +101,10 @@ def resize_img_to_show(name, img_temp, small=False):
     height = int(height * ratio)
     width = int(width * ratio)
     cv2.imshow(name, cv2.resize(img_temp, (width, height)))
+
+    if name == 'input':
+        global inputRatio
+        inputRatio = ratio
 
 
 def openFile():
@@ -148,6 +154,25 @@ def changeOutput(xy, diff):
         output[xy].set(output[xy].get() + diff)
         show_images()
     return wrapper
+
+
+def mouseClicked(event, p1, p0, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN or (event == cv2.EVENT_MOUSEMOVE and (flags & cv2.EVENT_FLAG_LBUTTON)):
+        p0 = int(p0 / inputRatio)
+        p1 = int(p1 / inputRatio)
+
+        print(p0, p1)
+        minDis = 1e9
+        minCorner = None
+        for corner in pos:
+            tempDis = (pos[corner][0].get() - p0)**2 + (pos[corner][1].get() - p1)**2
+            if tempDis < minDis:
+                minDis = tempDis
+                minCorner = corner
+
+        pos[minCorner][0].set(p0)
+        pos[minCorner][1].set(p1)
+        show_images()
 
 
 ROW = 0

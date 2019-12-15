@@ -116,9 +116,13 @@ def openFile():
         fileExtension = os.path.splitext(file_path)[1]
 
         img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
-        pos['BL'][0].set(img.shape[0] - 1)
-        pos['BR'][0].set(img.shape[0] - 1)
+        pos['TL'][0].set(0)
+        pos['TL'][1].set(0)
+        pos['TR'][0].set(0)
         pos['TR'][1].set(img.shape[1] - 1)
+        pos['BL'][0].set(img.shape[0] - 1)
+        pos['BL'][1].set(0)
+        pos['BR'][0].set(img.shape[0] - 1)
         pos['BR'][1].set(img.shape[1] - 1)
         show_images()
 
